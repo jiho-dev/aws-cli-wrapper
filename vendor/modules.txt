@@ -16,6 +16,7 @@ github.com/mattn/go-isatty
 ## explicit
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.5
+## explicit
 github.com/spf13/pflag
 # github.com/tidwall/gjson v1.14.0
 ## explicit
@@ -30,3 +31,6 @@ github.com/vaughan0/go-ini
 # golang.org/x/sys v0.0.0-20211205182925-97ca703d548d
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
+# gopkg.in/yaml.v2 v2.4.0
+## explicit
+gopkg.in/yaml.v2

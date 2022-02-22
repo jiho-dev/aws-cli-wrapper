@@ -7,8 +7,53 @@ import (
 
 	"github.com/TylerBrock/colorjson"
 	"github.com/fatih/color"
+	flag "github.com/spf13/pflag"
 	"github.com/tidwall/gjson"
 )
+
+func RunCmd(inCmds []string, adminVpc bool, flags *flag.FlagSet) {
+	profile := inCmds[2]
+	cmd := inCmds[0]
+	opts, _ := adminVpcCmdOpts[cmd]
+
+	var cmdOpt []string
+
+	cmdOpt = append(cmdOpt, "ec2")
+	cmdOpt = append(cmdOpt, "--profile")
+	cmdOpt = append(cmdOpt, profile)
+	if adminVpc {
+		cmdOpt = append(cmdOpt, "admin-vpc")
+		cmdOpt = append(cmdOpt, "--admin-action")
+	}
+
+	cmdOpt = append(cmdOpt, cmd)
+
+	for i, o := range opts {
+		if v, err := flags.GetString(o); v != "" && err == nil {
+			if i == 0 {
+				cmdOpt = append(cmdOpt, "--parameters")
+			}
+
+			cmdOpt = append(cmdOpt, fmt.Sprintf("Name=%s,Values=%v", o, v))
+		}
+	}
+
+	output, err := ExecuteAwsCli("aws", cmdOpt...)
+
+	if err != nil {
+		fmt.Printf("ERR: %s \n", err)
+		fmt.Printf("%s\n", output)
+		return
+	}
+
+	if adminVpc {
+		output = ParseOutput(output)
+	}
+
+	output = FormatJson(output)
+
+	fmt.Printf("%s\n", output)
+}
 
 func ExecuteAwsCli(name string, args ...string) (string, error) {
 	s := name
@@ -29,7 +74,7 @@ func ExecuteAwsCli(name string, args ...string) (string, error) {
 		return "", err
 	}
 
-	return ParseOutput(o), nil
+	return o, nil
 }
 
 func ParseOutput(output string) string {
@@ -39,7 +84,7 @@ func ParseOutput(output string) string {
 
 	value := gjson.Get(output, "*")
 
-	return FormatJson(value.String())
+	return value.String()
 
 	/*
 		value = gjson.Get(value.Str, "NetworkInterfaces")

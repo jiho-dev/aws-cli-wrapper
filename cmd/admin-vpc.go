@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -92,6 +91,7 @@ func adminVpcMain(cobraCmd *cobra.Command, args []string) {
 	}
 
 	var inCmds []string
+	flags := cobraCmd.Flags()
 
 	inCmds = append(inCmds, cobraCmd.Use)
 
@@ -101,35 +101,38 @@ func adminVpcMain(cobraCmd *cobra.Command, args []string) {
 		inCmds = append(inCmds, c1.Use)
 	}
 
-	profile := inCmds[2]
-	cmd := inCmds[0]
-	opts, _ := adminVpcCmdOpts[cmd]
+	RunCmd(inCmds, true, flags)
 
-	var cmdOpt []string
+	/*
+		profile := inCmds[2]
+		cmd := inCmds[0]
+		opts, _ := adminVpcCmdOpts[cmd]
 
-	cmdOpt = append(cmdOpt, "ec2")
-	cmdOpt = append(cmdOpt, "--profile")
-	cmdOpt = append(cmdOpt, profile)
-	cmdOpt = append(cmdOpt, "admin-vpc")
-	cmdOpt = append(cmdOpt, "--admin-action")
-	cmdOpt = append(cmdOpt, cmd)
+		var cmdOpt []string
 
-	flags := cobraCmd.Flags()
-	for i, o := range opts {
-		if v, err := flags.GetString(o); v != "" && err == nil {
-			if i == 0 {
-				cmdOpt = append(cmdOpt, "--parameters")
+		cmdOpt = append(cmdOpt, "ec2")
+		cmdOpt = append(cmdOpt, "--profile")
+		cmdOpt = append(cmdOpt, profile)
+		cmdOpt = append(cmdOpt, "admin-vpc")
+		cmdOpt = append(cmdOpt, "--admin-action")
+		cmdOpt = append(cmdOpt, cmd)
+
+		for i, o := range opts {
+			if v, err := flags.GetString(o); v != "" && err == nil {
+				if i == 0 {
+					cmdOpt = append(cmdOpt, "--parameters")
+				}
+
+				cmdOpt = append(cmdOpt, fmt.Sprintf("Name=%s,Values=%v", o, v))
 			}
-
-			cmdOpt = append(cmdOpt, fmt.Sprintf("Name=%s,Values=%v", o, v))
 		}
-	}
 
-	output, err := ExecuteAwsCli("aws", cmdOpt...)
+		output, err := ExecuteAwsCli("aws", cmdOpt...)
 
-	if err != nil {
-		fmt.Printf("ERR: %s \n", err)
-	} else {
-		fmt.Printf("%s\n", output)
-	}
+		if err != nil {
+			fmt.Printf("ERR: %s \n", err)
+		} else {
+			fmt.Printf("%s\n", output)
+		}
+	*/
 }
