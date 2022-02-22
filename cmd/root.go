@@ -20,6 +20,8 @@ func Execute() error {
 		DisableDescriptions: true,
 	}
 
+	ParseConfig()
+
 	//rootCmd.SetHelpFunc(Help)
 	return rootCmd.Execute()
 
