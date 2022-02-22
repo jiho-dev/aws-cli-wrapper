@@ -6,7 +6,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var adminVpcCmds = []string{
+/*
+var adminVpcCmds1 = []string{
 	"list-network-interface",
 	"list-blackpearl",
 	"list-security-group",
@@ -18,7 +19,7 @@ var adminVpcCmds = []string{
 	"list-vrouters",
 }
 
-var adminVpcCmdOpts = map[string][]string{
+var adminVpcCmdOpts1 = map[string][]string{
 	"list-network-interface": []string{
 		"host-ip",
 		"network-interface-id",
@@ -50,15 +51,19 @@ var adminVpcCmdOpts = map[string][]string{
 		"route-table-id", "vpc-id",
 	},
 }
+*/
 
-func newAdminVcpCmd() *cobra.Command {
+var adminVpcCmds map[string][]string
+
+func newAdminVcpCmd(conf Config) *cobra.Command {
 	adminVpcRootCmd := &cobra.Command{
 		Use: "admin-vpc",
 		//Short: "admin-vpc",
 		Run: adminVpcMain,
 	}
 
-	for _, c := range adminVpcCmds {
+	adminVpcCmds, _ = conf["admin-vpc"]
+	for c, opts := range adminVpcCmds {
 		// cmd
 		c := c
 		cmd := &cobra.Command{
@@ -67,8 +72,8 @@ func newAdminVcpCmd() *cobra.Command {
 			Run: adminVpcMain,
 		}
 
-		opts, ok := adminVpcCmdOpts[c]
-		if ok && len(opts) > 0 {
+		//opts, ok := adminVpcCmdOpts[c]
+		if len(opts) > 0 {
 			for _, o := range opts {
 				cmd.Flags().String(o, "", "")
 
@@ -101,7 +106,8 @@ func adminVpcMain(cobraCmd *cobra.Command, args []string) {
 		inCmds = append(inCmds, c1.Use)
 	}
 
-	RunCmd(inCmds, true, flags)
+	opts, _ := adminVpcCmds[cobraCmd.Use]
+	RunCmd(inCmds, opts, true, flags)
 
 	/*
 		profile := inCmds[2]

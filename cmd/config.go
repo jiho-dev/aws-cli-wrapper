@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
 
 	"gopkg.in/yaml.v2"
 )
@@ -44,9 +46,15 @@ var yamlConfig = `
 `
 
 func ParseConfig(fileName string) (Config, error) {
+	fileName, _ = filepath.Abs(fileName)
+	yamlFile, err := ioutil.ReadFile(fileName)
+
+	if err != nil {
+		return nil, err
+	}
 
 	m := make(map[string]interface{})
-	err := yaml.Unmarshal([]byte(yamlConfig), &m)
+	err = yaml.Unmarshal(yamlFile, &m)
 	if err != nil {
 		return nil, fmt.Errorf("error: %v", err)
 	}
@@ -84,8 +92,6 @@ func ParseConfig(fileName string) (Config, error) {
 
 		conf[k1] = values
 	}
-
-	fmt.Printf("### conf: %+v \n", conf)
 
 	return conf, nil
 }

@@ -9,21 +9,40 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "spc",
 	Short: "spc <profile> <sub-cmd> [flags}",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("Hello!!!")
+	},
+}
+
+var HelloCmd = &cobra.Command{
+	Use:   "hello",
+	Short: "Say hello",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("Hello!!!")
+	},
+}
+
+func init() {
+
+	rootCmd.AddCommand(HelloCmd)
+
 }
 
 // Execute executes cmd
 func Execute() error {
 
-	rootCmd.CompletionOptions = cobra.CompletionOptions{
-		DisableNoDescFlag:   true,
-		HiddenDefaultCmd:    true,
-		DisableDescriptions: true,
-	}
-
-	ParseConfig()
+	/*
+		rootCmd.CompletionOptions = cobra.CompletionOptions{
+			DisableNoDescFlag:   true,
+			HiddenDefaultCmd:    true,
+			DisableDescriptions: true,
+		}
+	*/
 
 	//rootCmd.SetHelpFunc(Help)
 	return rootCmd.Execute()
+
+	return nil
 
 }
 

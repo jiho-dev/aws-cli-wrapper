@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+/*
 var ec2Cmds = []string{
 	"describe-instances",
 	"describe-network-interfaces",
@@ -28,14 +29,18 @@ var ec2CmdOpts = map[string][]string{
 		"",
 	},
 }
+*/
 
-func newEc2Cmd() *cobra.Command {
+var ec2Cmds map[string][]string
+
+func newEc2Cmd(conf Config) *cobra.Command {
 	ec2Cmd := &cobra.Command{
 		Use: "ec2",
 		Run: ec2Main,
 	}
 
-	for _, c := range ec2Cmds {
+	ec2Cmds, _ = conf["ec2"]
+	for c, opts := range ec2Cmds {
 		// cmd
 		c := c
 		cmd := &cobra.Command{
@@ -43,8 +48,8 @@ func newEc2Cmd() *cobra.Command {
 			Run: ec2Main,
 		}
 
-		opts, ok := ec2CmdOpts[c]
-		if ok && len(opts) > 0 {
+		//opts, ok := ec2CmdOpts[c]
+		if len(opts) > 0 {
 			for _, o := range opts {
 				cmd.Flags().String(o, "", "")
 			}
@@ -73,5 +78,6 @@ func ec2Main(cobraCmd *cobra.Command, args []string) {
 		inCmds = append(inCmds, c1.Use)
 	}
 
-	RunCmd(inCmds, false, flags)
+	opts, _ := ec2Cmds[cobraCmd.Use]
+	RunCmd(inCmds, opts, false, flags)
 }

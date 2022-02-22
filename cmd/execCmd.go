@@ -11,10 +11,9 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func RunCmd(inCmds []string, adminVpc bool, flags *flag.FlagSet) {
+func RunCmd(inCmds []string, opts []string, adminVpc bool, flags *flag.FlagSet) {
 	profile := inCmds[2]
 	cmd := inCmds[0]
-	opts, _ := adminVpcCmdOpts[cmd]
 
 	var cmdOpt []string
 

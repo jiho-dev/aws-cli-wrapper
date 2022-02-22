@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path"
 	"sort"
 	"strings"
 
@@ -10,11 +11,18 @@ import (
 	"github.com/vaughan0/go-ini"
 )
 
+var awsDir = os.Getenv("HOME") + "/.aws/"
 var profileCmds []*cobra.Command
 
 func init() {
 	var profile []string
 	profile = listProfiles()
+
+	confFile := path.Join(awsDir, "aws-cli-wrapper.yaml")
+	conf, err := ParseConfig(confFile)
+	if err != nil {
+		fmt.Printf("ERR: %s\n", err)
+	}
 
 	for _, p := range profile {
 		cmd := &cobra.Command{
@@ -24,14 +32,14 @@ func init() {
 		}
 
 		// admin-vpc
-		c := newAdminVcpCmd()
+		c := newAdminVcpCmd(conf)
 		cmd.AddCommand(c)
 
 		// ec2
-		c = newEc2Cmd()
+		c = newEc2Cmd(conf)
 		cmd.AddCommand(c)
 
-		rootCmd.AddCommand(cmd)
+		//rootCmd.AddCommand(cmd)
 
 		profileCmds = append(profileCmds, cmd)
 	}
@@ -44,7 +52,7 @@ func profileMain(cmd *cobra.Command, args []string) {
 
 func listProfiles() []string {
 	// Make sure the config file exists
-	config := os.Getenv("HOME") + "/.aws/config"
+	config := path.Join(awsDir, "config")
 
 	if _, err := os.Stat(config); os.IsNotExist(err) {
 		fmt.Println("No credentials file found at: %s", config)
