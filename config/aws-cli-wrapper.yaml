@@ -1,0 +1,9 @@
+"admin-vpc":
+   - "list-network-interface": ["network-interface-id" , "host-ip"]
+   - "list-blackpearl":
+
+"ec2":
+   - "describe-instances": ["instance-ids"]
+   - "describe-network-interfaces": [ "network-interface-ids"]
+   - "describe-nat-gateways": [ "nat-gateway-ids"]
+
