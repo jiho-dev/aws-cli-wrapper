@@ -33,6 +33,17 @@
         "vpc-id"
   ]
 
+  - "list-vrouters": [
+      "blackpearl-ip", 
+      "host-ip", 
+      "network-interface-id", 
+      "instance-id" 
+  ]
+
+  - "list-address-associations":
+  - "list-public-ips": 
+  - "list-public-ipv4-pool":
+
 "ec2":
    - "describe-instances": ["instance-ids"]
    - "describe-network-interfaces": [ "network-interface-ids"]
