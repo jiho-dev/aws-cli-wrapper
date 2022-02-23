@@ -7,12 +7,12 @@ apilist:
     - host-ip
     - network-interface-id
     - vpc-id
-	- subnet-id
+    - subnet-id
     - private-ip-address
-	- owner-id
+    - owner-id
     - mac-address
     - nat-ip
-	- instance-id
+    - instance-id
   - api: list-blackpearl
     outputfield: Result
     opts: 
@@ -22,18 +22,22 @@ apilist:
     - network-interface-id
   - api: list-security-group
     outputfield: Result
+    opts: 
      - vpc-id
      - group-id
   - api: list-network-acl
     outputfield: Result
+    opts: 
     - network-acl-id
     - vpc-id
   - api: list-route-table
     outputfield: Result
+    opts: 
     - route-table-id
     - vpc-id
   - api: list-vrouters
     outputfield: Result
+    opts: 
     - blackpearl-ip 
     - host-ip 
     - network-interface-id

@@ -5,34 +5,11 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type ConfigItem map[string][]string
 type Config map[string]ConfigItem
-
-/*
-func getConfigItem(key string) map[string]string {
-	values := map[string]string{}
-
-	vals := viper.Get(key)
-	val, ok := vals.([]interface{})
-	if ok {
-		for _, val2 := range val {
-			val3, ok3 := val2.(map[interface{}]interface{})
-			if ok3 {
-				for key4, val4 := range val3 {
-					k := key4.(string)
-					v := val4.(string)
-					values[k] = v
-				}
-			}
-		}
-	}
-
-	return values
-}
-*/
 
 type ConfigApiItem struct {
 	Api         string   `yaml:api`
@@ -40,32 +17,39 @@ type ConfigApiItem struct {
 	Opts        []string `yaml:opts`
 }
 
+type ConfigApis map[string]ConfigItem
+
 type ConfigApi struct {
-	ApiType string          `yaml:apitype`
-	Apis    []ConfigApiItem `yaml:apis`
+	//ApiType string          `yaml:apitype`
+	Apis []ConfigApiItem `yaml:apis`
 }
 
 type ConfigApiList struct {
-	ApiList []ConfigApi `yaml:apilist`
+	//ApiList []ConfigApi `yaml:apilist`
+	ApiList []ConfigApi
 }
 
 func (api *ConfigApi) GetOpts(apiName string) *ConfigApiItem {
 
-	for _, api := range api.Apis {
-		if api.Api == apiName {
-			return &api
+	/*
+		for _, api := range api.Apis {
+			if api.Api == apiName {
+				return &api
+			}
 		}
-	}
+	*/
 
 	return nil
 }
 
 func (c *ConfigApiList) GetApiList(t string) *ConfigApi {
-	for _, a := range c.ApiList {
-		if a.ApiType == t {
-			return &a
+	/*
+		for _, a := range c.ApiList {
+			if a.ApiType == t {
+				return &a
+			}
 		}
-	}
+	*/
 
 	return nil
 }
@@ -84,63 +68,68 @@ func ParseConfigApi(fileName string) (*ConfigApiList, error) {
 	}
 
 	return &cc, nil
+}
 
-	/*
-		c := ConfigApiList{
-			ApiList: []ConfigApi{
-				ConfigApi{
-					ApiType: "admin-vpc",
-					Apis: []ConfigApiItem{
-						ConfigApiItem{
-							Api:         "list-network-interface",
-							OutputField: "NetworkInterfaces",
-							Opts:        []string{"host-ip", "network-interface-id", "vpc-id"},
-						},
-						ConfigApiItem{
-							Api:         "list-address-associations",
-							OutputField: "NetworkInterfaces",
-						},
-						ConfigApiItem{
-							Api:         "list-public-ips",
-							OutputField: "NetworkInterfaces",
-						},
-					},
-				},
+func YamlTest() {
+	//c := ConfigApiList{
+	//ApiList: []ConfigApi{
+	// c := []ConfigApi{
+	//c := map[string]ConfigApi{
+	c := map[string][]ConfigApiItem{
 
-				ConfigApi{
-					ApiType: "ec2",
-					Apis: []ConfigApiItem{
-						ConfigApiItem{
-							Api:         "describe-instances",
-							OutputField: "NetworkInterfaces",
-							Opts:        []string{"instance-ids"},
-						},
-						ConfigApiItem{
-							Api:         "describe-network-interfaces",
-							OutputField: "NetworkInterfaces",
-							Opts:        []string{"network-interface-ids"},
-						},
-
-						ConfigApiItem{
-							Api:         "get-console-output",
-							OutputField: "Output",
-							Opts:        []string{"instance-id"},
-						},
-					},
-				},
+		//"admin-vpc": //ConfigApi{
+		//ApiType: "admin-vpc",
+		//Apis: []ConfigApiItem{
+		"admin-vpc": []ConfigApiItem{
+			ConfigApiItem{
+				Api:         "list-network-interface",
+				OutputField: "NetworkInterfaces",
+				Opts:        []string{"host-ip", "network-interface-id", "vpc-id"},
 			},
-		}
+			ConfigApiItem{
+				Api:         "list-address-associations",
+				OutputField: "NetworkInterfaces",
+			},
+			ConfigApiItem{
+				Api:         "list-public-ips",
+				OutputField: "NetworkInterfaces",
+			},
+		},
+		//},
 
-		yamlData, err := yaml.Marshal(&c)
+		//"ec2": ConfigApi{
+		//ApiType: "ec2",
+		//Apis: []ConfigApiItem{
+		"ec2": []ConfigApiItem{
+			ConfigApiItem{
+				Api:         "describe-instances",
+				OutputField: "NetworkInterfaces",
+				Opts:        []string{"instance-ids"},
+			},
+			ConfigApiItem{
+				Api:         "describe-network-interfaces",
+				OutputField: "NetworkInterfaces",
+				Opts:        []string{"network-interface-ids"},
+			},
 
-		if err != nil {
-			fmt.Printf("Error while Marshaling. %v", err)
-		}
+			ConfigApiItem{
+				Api:         "get-console-output",
+				OutputField: "Output",
+				Opts:        []string{"instance-id"},
+			},
+		},
+		//},
+		//},
+	}
 
-		fmt.Println(" --- YAML ---")
-		fmt.Printf("%s \n", string(yamlData))
-	*/
+	yamlData, err := yaml.Marshal(&c)
 
+	if err != nil {
+		fmt.Printf("Error while Marshaling. %v", err)
+	}
+
+	fmt.Println(" --- YAML ---")
+	fmt.Printf("%s \n", string(yamlData))
 }
 
 func ParseConfig(fileName string) (Config, error) {
