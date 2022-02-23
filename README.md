@@ -19,4 +19,6 @@ the list item starts aws command and has parameter name
 ## zsh
 `$ ./spc completion zsh > "${fpath[1]}/_spc"`  
 
+or 
 
+`make zsh`  
