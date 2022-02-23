@@ -1,6 +1,37 @@
 "admin-vpc":
-   - "list-network-interface": ["network-interface-id" , "host-ip"]
-   - "list-blackpearl":
+  - "list-network-interface": [
+        "host-ip", 
+        "network-interface-id",
+		"vpc-id",
+		"subnet-id",
+		"private-ip-address",
+		"owner-id",
+		"mac-address",
+		"nat-ip",
+		"instance-id"
+    ]
+
+  - "list-blackpearl": [
+		"instance-id",
+		"blackpearl-ip",
+		"host-ip",
+		"network-interface-id"
+	]
+
+  - "list-security-group": [
+		"vpc-id", 
+        "group-id"
+	]
+
+  - "list-network-acl": [
+		"network-acl-id", 
+        "vpc-id"
+	]
+
+  - "list-route-table": [
+		"route-table-id", 
+        "vpc-id"
+  ]
 
 "ec2":
    - "describe-instances": ["instance-ids"]

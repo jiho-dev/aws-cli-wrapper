@@ -20,6 +20,7 @@ func RunCmd(inCmds []string, opts []string, adminVpc bool, flags *flag.FlagSet) 
 	cmdOpt = append(cmdOpt, "ec2")
 	cmdOpt = append(cmdOpt, "--profile")
 	cmdOpt = append(cmdOpt, profile)
+
 	if adminVpc {
 		cmdOpt = append(cmdOpt, "admin-vpc")
 		cmdOpt = append(cmdOpt, "--admin-action")
@@ -27,13 +28,21 @@ func RunCmd(inCmds []string, opts []string, adminVpc bool, flags *flag.FlagSet) 
 
 	cmdOpt = append(cmdOpt, cmd)
 
-	for i, o := range opts {
+	var optCnt int
+	for _, o := range opts {
 		if v, err := flags.GetString(o); v != "" && err == nil {
-			if i == 0 {
-				cmdOpt = append(cmdOpt, "--parameters")
-			}
+			if adminVpc {
+				if optCnt == 0 {
+					cmdOpt = append(cmdOpt, "--parameters")
+				}
 
-			cmdOpt = append(cmdOpt, fmt.Sprintf("Name=%s,Values=%v", o, v))
+				cmdOpt = append(cmdOpt, fmt.Sprintf("Name=%s,Values=%v", o, v))
+				optCnt++
+			} else {
+				cmdOpt = append(cmdOpt, fmt.Sprintf("--%s", o))
+				cmdOpt = append(cmdOpt, v)
+				optCnt += 2
+			}
 		}
 	}
 

@@ -3,66 +3,20 @@ package cmd
 import (
 	"os"
 
+	"github.com/jiho-dev/aws-cli-wrapper/config"
 	"github.com/spf13/cobra"
 )
 
-/*
-var adminVpcCmds1 = []string{
-	"list-network-interface",
-	"list-blackpearl",
-	"list-security-group",
-	"list-network-acl",
-	"list-public-ips",
-	"list-public-ipv4-pool",
-	"list-address-associations",
-	"list-route-table",
-	"list-vrouters",
-}
-
-var adminVpcCmdOpts1 = map[string][]string{
-	"list-network-interface": []string{
-		"host-ip",
-		"network-interface-id",
-		"vpc-id",
-		"subnet-id",
-		"private-ip-address",
-		"owner-id",
-		"mac-address",
-		"nat-ip",
-		"instance-id",
-	},
-
-	"list-blackpearl": []string{
-		"instance-id",
-		"blackpearl-ip",
-		"host-ip",
-		"network-interface-id",
-	},
-
-	"list-security-group": []string{
-		"vpc-id", "group-id",
-	},
-
-	"list-network-acl": []string{
-		"network-acl-id", "vpc-id",
-	},
-
-	"list-route-table": []string{
-		"route-table-id", "vpc-id",
-	},
-}
-*/
-
 var adminVpcCmds map[string][]string
 
-func newAdminVcpCmd(conf Config) *cobra.Command {
+func newAdminVcpCmd(conf config.Config) *cobra.Command {
 	adminVpcRootCmd := &cobra.Command{
-		Use: "admin-vpc",
+		Use: TYPE_ADMIN_VPC,
 		//Short: "admin-vpc",
 		Run: adminVpcMain,
 	}
 
-	adminVpcCmds, _ = conf["admin-vpc"]
+	adminVpcCmds, _ = conf[TYPE_ADMIN_VPC]
 	for c, opts := range adminVpcCmds {
 		// cmd
 		c := c
@@ -72,7 +26,6 @@ func newAdminVcpCmd(conf Config) *cobra.Command {
 			Run: adminVpcMain,
 		}
 
-		//opts, ok := adminVpcCmdOpts[c]
 		if len(opts) > 0 {
 			for _, o := range opts {
 				cmd.Flags().String(o, "", "")
@@ -90,7 +43,7 @@ func newAdminVcpCmd(conf Config) *cobra.Command {
 }
 
 func adminVpcMain(cobraCmd *cobra.Command, args []string) {
-	if cobraCmd.Use == "admin-vpc" {
+	if cobraCmd.Use == TYPE_ADMIN_VPC {
 		cobraCmd.Help()
 		os.Exit(0)
 	}
@@ -108,37 +61,4 @@ func adminVpcMain(cobraCmd *cobra.Command, args []string) {
 
 	opts, _ := adminVpcCmds[cobraCmd.Use]
 	RunCmd(inCmds, opts, true, flags)
-
-	/*
-		profile := inCmds[2]
-		cmd := inCmds[0]
-		opts, _ := adminVpcCmdOpts[cmd]
-
-		var cmdOpt []string
-
-		cmdOpt = append(cmdOpt, "ec2")
-		cmdOpt = append(cmdOpt, "--profile")
-		cmdOpt = append(cmdOpt, profile)
-		cmdOpt = append(cmdOpt, "admin-vpc")
-		cmdOpt = append(cmdOpt, "--admin-action")
-		cmdOpt = append(cmdOpt, cmd)
-
-		for i, o := range opts {
-			if v, err := flags.GetString(o); v != "" && err == nil {
-				if i == 0 {
-					cmdOpt = append(cmdOpt, "--parameters")
-				}
-
-				cmdOpt = append(cmdOpt, fmt.Sprintf("Name=%s,Values=%v", o, v))
-			}
-		}
-
-		output, err := ExecuteAwsCli("aws", cmdOpt...)
-
-		if err != nil {
-			fmt.Printf("ERR: %s \n", err)
-		} else {
-			fmt.Printf("%s\n", output)
-		}
-	*/
 }

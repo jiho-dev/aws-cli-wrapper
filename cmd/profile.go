@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/jiho-dev/aws-cli-wrapper/config"
 	"github.com/spf13/cobra"
 	"github.com/vaughan0/go-ini"
 )
@@ -19,9 +20,10 @@ func init() {
 	profile = listProfiles()
 
 	confFile := path.Join(awsDir, "aws-cli-wrapper.yaml")
-	conf, err := ParseConfig(confFile)
+	conf, err := config.ParseConfig(confFile)
 	if err != nil {
 		fmt.Printf("ERR: %s\n", err)
+		return
 	}
 
 	for _, p := range profile {
@@ -39,7 +41,7 @@ func init() {
 		c = newEc2Cmd(conf)
 		cmd.AddCommand(c)
 
-		//rootCmd.AddCommand(cmd)
+		rootCmd.AddCommand(cmd)
 
 		profileCmds = append(profileCmds, cmd)
 	}

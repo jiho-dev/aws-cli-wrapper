@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -9,35 +10,43 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "spc",
 	Short: "spc <profile> <sub-cmd> [flags}",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Hello!!!")
-	},
 }
 
-var HelloCmd = &cobra.Command{
-	Use:   "hello",
-	Short: "Say hello",
+var CompletionCmd = &cobra.Command{
+	Use:                   "completion [bash|zsh|fish|powershell]",
+	Short:                 "Generate completion script",
+	Long:                  "To load completions",
+	Hidden:                true,
+	DisableFlagsInUseLine: true,
+	ValidArgs:             []string{"bash", "zsh", "fish", "powershell"},
+	Args:                  cobra.ExactValidArgs(1),
+
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Hello!!!")
+		switch args[0] {
+		case "bash":
+			cmd.Root().GenBashCompletion(os.Stdout)
+		case "zsh":
+			cmd.Root().GenZshCompletion(os.Stdout)
+		case "fish":
+			cmd.Root().GenFishCompletion(os.Stdout, true)
+		case "powershell":
+			cmd.Root().GenPowerShellCompletionWithDesc(os.Stdout)
+		}
 	},
 }
 
 func init() {
-
-	rootCmd.AddCommand(HelloCmd)
-
+	rootCmd.AddCommand(CompletionCmd)
 }
 
 // Execute executes cmd
 func Execute() error {
 
-	/*
-		rootCmd.CompletionOptions = cobra.CompletionOptions{
-			DisableNoDescFlag:   true,
-			HiddenDefaultCmd:    true,
-			DisableDescriptions: true,
-		}
-	*/
+	rootCmd.CompletionOptions = cobra.CompletionOptions{
+		DisableNoDescFlag:   true,
+		HiddenDefaultCmd:    true,
+		DisableDescriptions: true,
+	}
 
 	//rootCmd.SetHelpFunc(Help)
 	return rootCmd.Execute()
