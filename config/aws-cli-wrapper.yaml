@@ -1,51 +1,69 @@
-"admin-vpc":
-  - "list-network-interface": [
-        "host-ip", 
-        "network-interface-id",
-		"vpc-id",
-		"subnet-id",
-		"private-ip-address",
-		"owner-id",
-		"mac-address",
-		"nat-ip",
-		"instance-id"
-    ]
+apilist:
+- apitype: admin-vpc
+  apis:
+  - api: list-network-interface
+    outputfield: Result
+    opts:
+    - host-ip
+    - network-interface-id
+    - vpc-id
+	- subnet-id
+    - private-ip-address
+	- owner-id
+    - mac-address
+    - nat-ip
+	- instance-id
+  - api: list-blackpearl
+    outputfield: Result
+    opts: 
+    - instance-id
+    - blackpearl-ip
+    - host-ip
+    - network-interface-id
+  - api: list-security-group
+    outputfield: Result
+     - vpc-id
+     - group-id
+  - api: list-network-acl
+    outputfield: Result
+    - network-acl-id
+    - vpc-id
+  - api: list-route-table
+    outputfield: Result
+    - route-table-id
+    - vpc-id
+  - api: list-vrouters
+    outputfield: Result
+    - blackpearl-ip 
+    - host-ip 
+    - network-interface-id
+    - instance-id
+  - api: list-address-associations
+    outputfield: 
+    opts: []
+  - api: list-public-ips
+    outputfield: 
+    opts: []
+  - api: list-public-ipv4-pool
+    outputfield: 
+    opts: []
 
-  - "list-blackpearl": [
-		"instance-id",
-		"blackpearl-ip",
-		"host-ip",
-		"network-interface-id"
-	]
-
-  - "list-security-group": [
-		"vpc-id", 
-        "group-id"
-	]
-
-  - "list-network-acl": [
-		"network-acl-id", 
-        "vpc-id"
-	]
-
-  - "list-route-table": [
-		"route-table-id", 
-        "vpc-id"
-  ]
-
-  - "list-vrouters": [
-      "blackpearl-ip", 
-      "host-ip", 
-      "network-interface-id", 
-      "instance-id" 
-  ]
-
-  - "list-address-associations":
-  - "list-public-ips": 
-  - "list-public-ipv4-pool":
-
-"ec2":
-   - "describe-instances": ["instance-ids"]
-   - "describe-network-interfaces": [ "network-interface-ids"]
-   - "describe-nat-gateways": [ "nat-gateway-ids"]
+- apitype: ec2
+  apis:
+  - api: describe-instances
+    outputfield: 
+    opts:
+    - instance-ids
+  - api: describe-network-interfaces
+    outputfield: 
+    opts:
+    - network-interface-ids
+  - api: get-console-output
+    outputfield: Output
+    opts:
+    - instance-id
+  - api: describe-nat-gateways
+    outputfield: Output
+    opts:
+     - nat-gateway-ids
 

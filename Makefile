@@ -1,5 +1,6 @@
 all:
 	go build -o spc
+	./spc
 
 
 zsh:

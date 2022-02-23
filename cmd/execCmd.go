@@ -11,7 +11,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func RunCmd(inCmds []string, opts []string, adminVpc bool, flags *flag.FlagSet) {
+func RunCmd(inCmds []string, opts []string, adminVpc bool, flags *flag.FlagSet) (string, error) {
 	profile := inCmds[2]
 	cmd := inCmds[0]
 
@@ -46,21 +46,24 @@ func RunCmd(inCmds []string, opts []string, adminVpc bool, flags *flag.FlagSet) 
 		}
 	}
 
-	output, err := ExecuteAwsCli("aws", cmdOpt...)
+	return ExecuteAwsCli("aws", cmdOpt...)
 
-	if err != nil {
-		fmt.Printf("ERR: %s \n", err)
-		fmt.Printf("%s\n", output)
-		return
-	}
+	/*
+		fmt.Printf(">> %s\n", output)
+		query, err := gojq.Parse(".foo | ..")
+	*/
 
-	if adminVpc {
-		output = ParseOutput(output)
-	}
+	/*
 
-	output = FormatJson(output)
+		if adminVpc {
+			output = ParseOutput(output)
+		}
 
-	fmt.Printf("%s\n", output)
+		output = FormatJson(output)
+		output = strings.Replace(output, "\\r\\n", "\r\n", -1)
+
+		fmt.Printf(">>> %s\n", output)
+	*/
 }
 
 func ExecuteAwsCli(name string, args ...string) (string, error) {
@@ -85,14 +88,17 @@ func ExecuteAwsCli(name string, args ...string) (string, error) {
 	return o, nil
 }
 
-func ParseOutput(output string) string {
+func ParseOutput(output string, outField string) string {
 	// Result
 	//value := gjson.Get(output, "Result")
 	//value := gjson.Parse(output)
 
-	value := gjson.Get(output, "*")
+	value := gjson.Get(output, outField)
+	//value := gjson.Get(output, "*")
 
-	return value.String()
+	output = value.String()
+
+	return output
 
 	/*
 		value = gjson.Get(value.Str, "NetworkInterfaces")
@@ -118,10 +124,10 @@ func FormatJson(output string) string {
 	f := colorjson.NewFormatter()
 	f.KeyColor = color.New(color.FgBlue)
 	f.Indent = 3
+	f.RawStrings = true
 
 	// Marshall the Colorized JSON
 	b, _ := f.Marshal(obj)
 
 	return string(b)
-	//fmt.Println(string(b))
 }

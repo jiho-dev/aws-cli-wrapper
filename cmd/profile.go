@@ -20,7 +20,7 @@ func init() {
 	profile = listProfiles()
 
 	confFile := path.Join(awsDir, "aws-cli-wrapper.yaml")
-	conf, err := config.ParseConfig(confFile)
+	conf, err := config.ParseConfigApi(confFile)
 	if err != nil {
 		fmt.Printf("ERR: %s\n", err)
 		return

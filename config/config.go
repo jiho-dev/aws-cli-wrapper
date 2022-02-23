@@ -34,6 +34,115 @@ func getConfigItem(key string) map[string]string {
 }
 */
 
+type ConfigApiItem struct {
+	Api         string   `yaml:api`
+	OutputField string   `yaml:outputfield`
+	Opts        []string `yaml:opts`
+}
+
+type ConfigApi struct {
+	ApiType string          `yaml:apitype`
+	Apis    []ConfigApiItem `yaml:apis`
+}
+
+type ConfigApiList struct {
+	ApiList []ConfigApi `yaml:apilist`
+}
+
+func (api *ConfigApi) GetOpts(apiName string) *ConfigApiItem {
+
+	for _, api := range api.Apis {
+		if api.Api == apiName {
+			return &api
+		}
+	}
+
+	return nil
+}
+
+func (c *ConfigApiList) GetApiList(t string) *ConfigApi {
+	for _, a := range c.ApiList {
+		if a.ApiType == t {
+			return &a
+		}
+	}
+
+	return nil
+}
+
+func ParseConfigApi(fileName string) (*ConfigApiList, error) {
+	fileName, _ = filepath.Abs(fileName)
+	yamlFile, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		return nil, err
+	}
+
+	var cc ConfigApiList
+	err = yaml.Unmarshal(yamlFile, &cc)
+	if err != nil {
+		return nil, err
+	}
+
+	return &cc, nil
+
+	/*
+		c := ConfigApiList{
+			ApiList: []ConfigApi{
+				ConfigApi{
+					ApiType: "admin-vpc",
+					Apis: []ConfigApiItem{
+						ConfigApiItem{
+							Api:         "list-network-interface",
+							OutputField: "NetworkInterfaces",
+							Opts:        []string{"host-ip", "network-interface-id", "vpc-id"},
+						},
+						ConfigApiItem{
+							Api:         "list-address-associations",
+							OutputField: "NetworkInterfaces",
+						},
+						ConfigApiItem{
+							Api:         "list-public-ips",
+							OutputField: "NetworkInterfaces",
+						},
+					},
+				},
+
+				ConfigApi{
+					ApiType: "ec2",
+					Apis: []ConfigApiItem{
+						ConfigApiItem{
+							Api:         "describe-instances",
+							OutputField: "NetworkInterfaces",
+							Opts:        []string{"instance-ids"},
+						},
+						ConfigApiItem{
+							Api:         "describe-network-interfaces",
+							OutputField: "NetworkInterfaces",
+							Opts:        []string{"network-interface-ids"},
+						},
+
+						ConfigApiItem{
+							Api:         "get-console-output",
+							OutputField: "Output",
+							Opts:        []string{"instance-id"},
+						},
+					},
+				},
+			},
+		}
+
+		yamlData, err := yaml.Marshal(&c)
+
+		if err != nil {
+			fmt.Printf("Error while Marshaling. %v", err)
+		}
+
+		fmt.Println(" --- YAML ---")
+		fmt.Printf("%s \n", string(yamlData))
+	*/
+
+}
+
 func ParseConfig(fileName string) (Config, error) {
 	fileName, _ = filepath.Abs(fileName)
 	yamlFile, err := ioutil.ReadFile(fileName)
