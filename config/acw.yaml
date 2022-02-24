@@ -81,6 +81,17 @@ apigroup:
             args: []
         describe-nat-gateways:
             outputfield: Output
-            args:
+            required:
                 - nat-gateway-ids
+            args: []
+        reboot-nat-gateways:
+            outputfield: Output
+            required:
+                - nat-gateway-ids
+            args: []
+        replace-nat-gateways:
+            outputfield: Output
+            required:
+                - nat-gateway-ids
+            args: []
 
