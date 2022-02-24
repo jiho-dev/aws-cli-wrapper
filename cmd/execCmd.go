@@ -23,47 +23,41 @@ func RunCmd(inCmds []string, apiArgs []string, adminVpc bool, flags *flag.FlagSe
 
 	if adminVpc {
 		cmdOpt = append(cmdOpt, "admin-vpc")
-		cmdOpt = append(cmdOpt, "--admin-action")
+		if cmd == SHOW_HELP {
+			cmd = "--h"
+		} else {
+			cmdOpt = append(cmdOpt, "--admin-action")
+		}
+	} else if cmd == SHOW_HELP {
+		return "", nil
 	}
 
 	cmdOpt = append(cmdOpt, cmd)
 
-	var optCnt int
-	for _, o := range apiArgs {
-		if v, err := flags.GetString(o); v != "" && err == nil {
-			if adminVpc {
-				if optCnt == 0 {
-					cmdOpt = append(cmdOpt, "--parameters")
-				}
+	subShowHelp, _ := flags.GetBool(SHOW_HELP)
+	if subShowHelp {
+		cmdOpt = append(cmdOpt, "--h")
+	} else {
+		var optCnt int
+		for _, o := range apiArgs {
+			if v, err := flags.GetString(o); v != "" && err == nil {
+				if adminVpc {
+					if optCnt == 0 {
+						cmdOpt = append(cmdOpt, "--parameters")
+					}
 
-				cmdOpt = append(cmdOpt, fmt.Sprintf("Name=%s,Values=%v", o, v))
-				optCnt++
-			} else {
-				cmdOpt = append(cmdOpt, fmt.Sprintf("--%s", o))
-				cmdOpt = append(cmdOpt, v)
-				optCnt += 2
+					cmdOpt = append(cmdOpt, fmt.Sprintf("Name=%s,Values=%v", o, v))
+					optCnt++
+				} else {
+					cmdOpt = append(cmdOpt, fmt.Sprintf("--%s", o))
+					cmdOpt = append(cmdOpt, v)
+					optCnt += 2
+				}
 			}
 		}
 	}
 
 	return ExecuteAwsCli("aws", cmdOpt...)
-
-	/*
-		fmt.Printf(">> %s\n", output)
-		query, err := gojq.Parse(".foo | ..")
-	*/
-
-	/*
-
-		if adminVpc {
-			output = ParseOutput(output)
-		}
-
-		output = FormatJson(output)
-		output = strings.Replace(output, "\\r\\n", "\r\n", -1)
-
-		fmt.Printf(">>> %s\n", output)
-	*/
 }
 
 func ExecuteAwsCli(name string, args ...string) (string, error) {
@@ -89,31 +83,10 @@ func ExecuteAwsCli(name string, args ...string) (string, error) {
 }
 
 func ParseOutput(output string, outField string) string {
-	// Result
-	//value := gjson.Get(output, "Result")
-	//value := gjson.Parse(output)
-
 	value := gjson.Get(output, outField)
-	//value := gjson.Get(output, "*")
-
 	output = value.String()
 
 	return output
-
-	/*
-		value = gjson.Get(value.Str, "NetworkInterfaces")
-
-		if value.Str != "" {
-			FormatJson(value.String())
-		} else if value.IsArray() {
-			value.ForEach(
-				func(k, v gjson.Result) bool {
-					ss := v.String()
-					FormatJson(ss)
-					return true
-				})
-		}
-	*/
 }
 
 func FormatJson(output string) string {

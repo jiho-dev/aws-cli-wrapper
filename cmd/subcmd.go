@@ -29,8 +29,17 @@ func InitApiGroupCmd(apiGroup string, apis config.AcwConfigApis) *cobra.Command 
 			subCmd.Flags().String(o, "", "")
 		}
 
+		subCmd.Flags().Bool(SHOW_HELP, false, "")
+
 		cmd.AddCommand(subCmd)
 	}
+
+	showHelpCmd := &cobra.Command{
+		Use: SHOW_HELP,
+		Run: apiGroupMain,
+	}
+
+	cmd.AddCommand(showHelpCmd)
 
 	return cmd
 }
@@ -67,7 +76,7 @@ func apiGroupMain(cobraCmd *cobra.Command, args []string) {
 		apiArgs = append(apiArgs, opts.Required...)
 	}
 
-	isAdminVpc := parent.Use == TYPE_ADMIN_VPC
+	isAdminVpc := parent.Use == ADMIN_VPC
 
 	output, err := RunCmd(inCmds, apiArgs, isAdminVpc, flags)
 	if err != nil {
