@@ -80,7 +80,7 @@ func apiGroupMain(cobraCmd *cobra.Command, args []string) {
 	}
 
 	if output == "" {
-		fmt.Printf("No Output")
+		fmt.Printf("No Output\n")
 		return
 	}
 
