@@ -5,4 +5,4 @@ all:
 
 zsh:
 	./acw completion zsh > _acw
-	cp _acw /Users/jiho.jung/.oh-my-zsh/completions/
+	cp _acw /Users/jiho.jung/.oh-my-zsh/functions/
