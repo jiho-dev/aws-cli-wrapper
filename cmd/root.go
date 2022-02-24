@@ -8,9 +8,10 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "acw",
-	Short: "acw <profile> <sub-cmd> [flags}",
-	Long:  "aws-cli-wrapper to support shell completion for some command",
+	Use:               "acw",
+	Short:             "acw <api-group> <sub-cmd> [flags]",
+	Long:              "aws-cli-wrapper to support shell completion for some command",
+	CompletionOptions: CompOpt,
 }
 
 var CompletionCmd = &cobra.Command{
@@ -43,12 +44,14 @@ func init() {
 // Execute executes cmd
 func Execute() error {
 
-	rootCmd.CompletionOptions = cobra.CompletionOptions{
-		DisableDefaultCmd:   true,
-		DisableNoDescFlag:   true,
-		HiddenDefaultCmd:    true,
-		DisableDescriptions: true,
-	}
+	/*
+		rootCmd.CompletionOptions = cobra.CompletionOptions{
+			DisableDefaultCmd:   true,
+			DisableNoDescFlag:   true,
+			HiddenDefaultCmd:    true,
+			DisableDescriptions: true,
+		}
+	*/
 
 	//rootCmd.SetHelpFunc(Help)
 	return rootCmd.Execute()
@@ -61,9 +64,7 @@ func Help(cmd *cobra.Command, s []string) {
 
 	fmt.Printf("%s: warpper of aws cli for SPC\n\n", cmd.Use)
 
-	fmt.Printf("Usage: %s <profile> <sub-cmd> [flags] \n", cmd.Use)
-	fmt.Printf("  <profile>: profile name in aws config\n")
+	fmt.Printf("Usage: %s <api-group> <sub-cmd> [flags] \n", cmd.Use)
+	fmt.Printf("  <api-group>: group of api, admin-vpc or ec2 \n")
 	fmt.Printf("  <sub-cmd>: \n")
-	fmt.Printf("    - admin-vpc \n")
-	fmt.Printf("    - ec2 \n")
 }

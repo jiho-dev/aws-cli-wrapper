@@ -13,7 +13,11 @@ import (
 )
 
 func RunCmd(inCmds []string, apiArgs []string, adminVpc bool, flags *flag.FlagSet) (string, error) {
-	profile := inCmds[2]
+	profile, err := flags.GetString(PROFILE)
+	if err != nil {
+		return "", err
+	}
+
 	cmd := inCmds[0]
 
 	var cmdOpt []string
@@ -31,7 +35,6 @@ func RunCmd(inCmds []string, apiArgs []string, adminVpc bool, flags *flag.FlagSe
 		}
 	} else if cmd == SHOW_HELP {
 		return ShowEc2Cmd(), nil
-		//return "", nil
 	}
 
 	cmdOpt = append(cmdOpt, cmd)

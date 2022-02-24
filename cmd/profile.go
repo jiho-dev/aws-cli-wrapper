@@ -25,35 +25,21 @@ var CompOpt = cobra.CompletionOptions{
 func init() {
 	var profile []string
 	profile = listProfiles()
+	_ = profile
 
 	confFile := path.Join(awsDir, "acw.yaml")
 	conf, err := config.ParseConfig(confFile)
 	if err != nil {
-		//fmt.Printf("ERR: %s\n", err)
 		return
 	}
 
 	AcwConfig = conf
 
-	for _, p := range profile {
-		cmd := &cobra.Command{
-			Use:               p,
-			Run:               profileMain,
-			CompletionOptions: CompOpt,
-		}
+	for apiGroup, apis := range conf.ApiGroup {
+		subCmd := InitApiGroupCmd(apiGroup, apis)
 
-		for apiGroup, apis := range conf.ApiGroup {
-			subCmd := InitApiGroupCmd(apiGroup, apis)
-			cmd.AddCommand(subCmd)
-		}
-
-		rootCmd.AddCommand(cmd)
+		rootCmd.AddCommand(subCmd)
 	}
-}
-
-func profileMain(cmd *cobra.Command, args []string) {
-	cmd.Help()
-	os.Exit(0)
 }
 
 func listProfiles() []string {

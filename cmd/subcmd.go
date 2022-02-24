@@ -32,6 +32,7 @@ func InitApiGroupCmd(apiGroup string, apis config.AcwConfigApis) *cobra.Command 
 			subCmd.Flags().String(o, "", "")
 		}
 
+		addProfileCmd(subCmd)
 		subCmd.Flags().Bool(SHOW_HELP, false, "")
 
 		cmd.AddCommand(subCmd)
@@ -43,9 +44,21 @@ func InitApiGroupCmd(apiGroup string, apis config.AcwConfigApis) *cobra.Command 
 		CompletionOptions: CompOpt,
 	}
 
+	addProfileCmd(showHelpCmd)
+
 	cmd.AddCommand(showHelpCmd)
 
 	return cmd
+}
+
+func addProfileCmd(cmd *cobra.Command) {
+	cmd.Flags().String(PROFILE, "", "")
+	cmd.MarkFlagRequired(PROFILE)
+	cmd.RegisterFlagCompletionFunc(PROFILE, getProfile)
+}
+
+func getProfile(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	return listProfiles(), cobra.ShellCompDirectiveNoFileComp
 }
 
 func getApiArgs(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
@@ -68,10 +81,10 @@ func apiGroupMain(cobraCmd *cobra.Command, args []string) {
 		depth++
 	}
 
-	// acw <profile> <api-group> <cmd> [args]
-	//                             ^
-	// 0   1         2           3
-	if depth < 3 {
+	// acw <api-group> <cmd> [args]
+	//                 ^
+	// 0   1           2
+	if depth < 2 {
 		cobraCmd.Help()
 		os.Exit(0)
 	}
