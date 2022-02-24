@@ -8,8 +8,9 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "spc",
-	Short: "spc <profile> <sub-cmd> [flags}",
+	Use:   "acw",
+	Short: "acw <profile> <sub-cmd> [flags}",
+	Long:  "aws-cli-wrapper to support shell completion for some command",
 }
 
 var CompletionCmd = &cobra.Command{

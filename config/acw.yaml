@@ -1,0 +1,86 @@
+## aws-cli-wrapper config
+
+version: "1"
+apigroup:
+    admin-vpc:
+        list-network-interface:
+            outputfield: Result
+            required: []
+            args:
+                - host-ip
+                - network-interface-id
+                - vpc-id
+                - subnet-id
+                - private-ip-address
+                - owner-id
+                - mac-address
+                - nat-ip
+                - instance-id
+        list-blackpearl:
+            outputfield: Result
+            required: []
+            args: 
+                - instance-id
+                - blackpearl-ip
+                - host-ip
+                - network-interface-id
+        list-security-group:
+            outputfield: Result
+            required: []
+            args: 
+                - vpc-id
+                - group-id
+        list-network-acl:
+            outputfield: Result
+            required: []
+            args: 
+                - network-acl-id
+                - vpc-id
+        list-route-table:
+            outputfield: Result
+            required: []
+            args: 
+              - route-table-id
+              - vpc-id
+        list-vrouters:
+            outputfield: Result
+            required: []
+            args: 
+                - blackpearl-ip 
+                - host-ip 
+                - network-interface-id
+                - instance-id
+        list-address-associations:
+            outputfield: 
+            required: []
+            opts: []
+        list-public-ips:
+            outputfield: 
+            required: []
+            opts: []
+        list-public-ipv4-pool:
+            outputfield: 
+            required: []
+            opts: []
+
+    ec2:
+        describe-instances:
+            outputfield: 
+            required: []
+            args:
+                - instance-ids
+        describe-network-interfaces:
+            outputfield: 
+            required: []
+            args:
+                - network-interface-ids
+        get-console-output:
+            outputfield: Output
+            required:
+                - instance-id
+            args: []
+        describe-nat-gateways:
+            outputfield: Output
+            args:
+                - nat-gateway-ids
+

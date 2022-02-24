@@ -1,8 +1,8 @@
 all:
-	go build -o spc
-	./spc
+	go build -o acw
+	/bin/cp ./acw ~/bin
 
 
 zsh:
-	./spc completion zsh > _spc
-	cp _spc /Users/jiho.jung/.oh-my-zsh/completions/
+	./acw completion zsh > _acw
+	cp _acw /Users/jiho.jung/.oh-my-zsh/completions/

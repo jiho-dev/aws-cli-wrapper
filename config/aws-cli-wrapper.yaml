@@ -1,73 +1,74 @@
-apilist:
-- apitype: admin-vpc
-  apis:
-  - api: list-network-interface
-    outputfield: Result
-    opts:
-    - host-ip
-    - network-interface-id
-    - vpc-id
-    - subnet-id
-    - private-ip-address
-    - owner-id
-    - mac-address
-    - nat-ip
-    - instance-id
-  - api: list-blackpearl
-    outputfield: Result
-    opts: 
-    - instance-id
-    - blackpearl-ip
-    - host-ip
-    - network-interface-id
-  - api: list-security-group
-    outputfield: Result
-    opts: 
-     - vpc-id
-     - group-id
-  - api: list-network-acl
-    outputfield: Result
-    opts: 
-    - network-acl-id
-    - vpc-id
-  - api: list-route-table
-    outputfield: Result
-    opts: 
-    - route-table-id
-    - vpc-id
-  - api: list-vrouters
-    outputfield: Result
-    opts: 
-    - blackpearl-ip 
-    - host-ip 
-    - network-interface-id
-    - instance-id
-  - api: list-address-associations
-    outputfield: 
-    opts: []
-  - api: list-public-ips
-    outputfield: 
-    opts: []
-  - api: list-public-ipv4-pool
-    outputfield: 
-    opts: []
+## aws-cli-wrapper config
 
-- apitype: ec2
-  apis:
-  - api: describe-instances
-    outputfield: 
-    opts:
-    - instance-ids
-  - api: describe-network-interfaces
-    outputfield: 
-    opts:
-    - network-interface-ids
-  - api: get-console-output
-    outputfield: Output
-    opts:
-    - instance-id
-  - api: describe-nat-gateways
-    outputfield: Output
-    opts:
-     - nat-gateway-ids
+version: "1"
+apigroup:
+    admin-vpc:
+        list-network-interface:
+            outputfield: Result
+            args:
+                - host-ip
+                - network-interface-id
+                - vpc-id
+                - subnet-id
+                - private-ip-address
+                - owner-id
+                - mac-address
+                - nat-ip
+                - instance-id
+        list-blackpearl:
+            outputfield: Result
+            args: 
+                - instance-id
+                - blackpearl-ip
+                - host-ip
+                - network-interface-id
+        list-security-group:
+            outputfield: Result
+            args: 
+                - vpc-id
+                - group-id
+        list-network-acl:
+            outputfield: Result
+            args: 
+                - network-acl-id
+                - vpc-id
+        list-route-table:
+            outputfield: Result
+            args: 
+              - route-table-id
+              - vpc-id
+        list-vrouters:
+            outputfield: Result
+            args: 
+                - blackpearl-ip 
+                - host-ip 
+                - network-interface-id
+                - instance-id
+        list-address-associations:
+            outputfield: 
+            opts: []
+        list-public-ips:
+            outputfield: 
+            opts: []
+        list-public-ipv4-pool:
+            outputfield: 
+            opts: []
+
+    ec2:
+        describe-instances:
+            outputfield: 
+            opts:
+                - instance-ids
+        describe-network-interfaces:
+            outputfield: 
+            opts:
+                - network-interface-ids
+        get-console-output:
+            outputfield: Output
+            opts:
+                - instance-id
+        describe-nat-gateways:
+            outputfield: Output
+            opts:
+                - nat-gateway-ids
 

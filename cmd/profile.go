@@ -13,37 +13,33 @@ import (
 )
 
 var awsDir = os.Getenv("HOME") + "/.aws/"
-var profileCmds []*cobra.Command
+var AcwConfig *config.AcwConfig
 
 func init() {
 	var profile []string
 	profile = listProfiles()
 
-	confFile := path.Join(awsDir, "aws-cli-wrapper.yaml")
-	conf, err := config.ParseConfigApi(confFile)
+	confFile := path.Join(awsDir, "acw.yaml")
+	conf, err := config.ParseConfig(confFile)
 	if err != nil {
 		fmt.Printf("ERR: %s\n", err)
 		return
 	}
 
+	AcwConfig = conf
+
 	for _, p := range profile {
 		cmd := &cobra.Command{
 			Use: p,
-			//Short: fmt.Sprintf("profile idx: %d", i),
 			Run: profileMain,
 		}
 
-		// admin-vpc
-		c := newAdminVcpCmd(conf)
-		cmd.AddCommand(c)
-
-		// ec2
-		c = newEc2Cmd(conf)
-		cmd.AddCommand(c)
+		for apiGroup, apis := range conf.ApiGroup {
+			subCmd := InitApiGroupCmd(apiGroup, apis)
+			cmd.AddCommand(subCmd)
+		}
 
 		rootCmd.AddCommand(cmd)
-
-		profileCmds = append(profileCmds, cmd)
 	}
 }
 

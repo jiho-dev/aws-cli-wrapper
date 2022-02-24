@@ -11,7 +11,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func RunCmd(inCmds []string, opts []string, adminVpc bool, flags *flag.FlagSet) (string, error) {
+func RunCmd(inCmds []string, apiArgs []string, adminVpc bool, flags *flag.FlagSet) (string, error) {
 	profile := inCmds[2]
 	cmd := inCmds[0]
 
@@ -29,7 +29,7 @@ func RunCmd(inCmds []string, opts []string, adminVpc bool, flags *flag.FlagSet) 
 	cmdOpt = append(cmdOpt, cmd)
 
 	var optCnt int
-	for _, o := range opts {
+	for _, o := range apiArgs {
 		if v, err := flags.GetString(o); v != "" && err == nil {
 			if adminVpc {
 				if optCnt == 0 {
