@@ -7,5 +7,7 @@ import (
 
 func main() {
 	_ = cmd.Execute()
+
 	//config.YamlTest()
+	//cmd.ShowEc2Cmd()
 }

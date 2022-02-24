@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os/exec"
+	"strings"
 
 	"github.com/TylerBrock/colorjson"
 	"github.com/fatih/color"
@@ -29,7 +30,8 @@ func RunCmd(inCmds []string, apiArgs []string, adminVpc bool, flags *flag.FlagSe
 			cmdOpt = append(cmdOpt, "--admin-action")
 		}
 	} else if cmd == SHOW_HELP {
-		return "", nil
+		return ShowEc2Cmd(), nil
+		//return "", nil
 	}
 
 	cmdOpt = append(cmdOpt, cmd)
@@ -103,4 +105,29 @@ func FormatJson(output string) string {
 	b, _ := f.Marshal(obj)
 
 	return string(b)
+}
+
+func ShowEc2Cmd() string {
+	var o []string
+	out, _ := ExecuteAwsCli("aws", "ec2", "help")
+	l := strings.Split(out, "\n")
+	for _, cmd := range l {
+		if strings.Index(cmd, "o ") < 0 {
+			continue
+		}
+
+		cmd = strings.TrimSpace(cmd)
+		if len(cmd) < 1 {
+			continue
+		}
+
+		cc := strings.Split(cmd, " ")
+		if len(cc) < 2 {
+			continue
+		}
+
+		o = append(o, cc[1])
+	}
+
+	return strings.Join(o, "\n")
 }
