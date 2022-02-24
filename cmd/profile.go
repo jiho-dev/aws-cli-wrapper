@@ -15,6 +15,13 @@ import (
 var awsDir = os.Getenv("HOME") + "/.aws/"
 var AcwConfig *config.AcwConfig
 
+var CompOpt = cobra.CompletionOptions{
+	DisableDefaultCmd:   true,
+	DisableNoDescFlag:   true,
+	HiddenDefaultCmd:    true,
+	DisableDescriptions: true,
+}
+
 func init() {
 	var profile []string
 	profile = listProfiles()
@@ -22,7 +29,7 @@ func init() {
 	confFile := path.Join(awsDir, "acw.yaml")
 	conf, err := config.ParseConfig(confFile)
 	if err != nil {
-		fmt.Printf("ERR: %s\n", err)
+		//fmt.Printf("ERR: %s\n", err)
 		return
 	}
 
@@ -30,8 +37,9 @@ func init() {
 
 	for _, p := range profile {
 		cmd := &cobra.Command{
-			Use: p,
-			Run: profileMain,
+			Use:               p,
+			Run:               profileMain,
+			CompletionOptions: CompOpt,
 		}
 
 		for apiGroup, apis := range conf.ApiGroup {

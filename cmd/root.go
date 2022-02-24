@@ -44,6 +44,7 @@ func init() {
 func Execute() error {
 
 	rootCmd.CompletionOptions = cobra.CompletionOptions{
+		DisableDefaultCmd:   true,
 		DisableNoDescFlag:   true,
 		HiddenDefaultCmd:    true,
 		DisableDescriptions: true,

@@ -10,14 +10,17 @@ import (
 
 func InitApiGroupCmd(apiGroup string, apis config.AcwConfigApis) *cobra.Command {
 	cmd := &cobra.Command{
-		Use: apiGroup,
-		Run: apiGroupMain,
+		Use:               apiGroup,
+		Run:               apiGroupMain,
+		CompletionOptions: CompOpt,
 	}
 
 	for apiName, opt := range apis {
 		subCmd := &cobra.Command{
-			Use: apiName,
-			Run: cmd.Run,
+			Use:               apiName,
+			Run:               cmd.Run,
+			ValidArgsFunction: getApiArgs,
+			CompletionOptions: CompOpt,
 		}
 
 		for _, o := range opt.Required {
@@ -35,13 +38,20 @@ func InitApiGroupCmd(apiGroup string, apis config.AcwConfigApis) *cobra.Command 
 	}
 
 	showHelpCmd := &cobra.Command{
-		Use: SHOW_HELP,
-		Run: apiGroupMain,
+		Use:               SHOW_HELP,
+		Run:               apiGroupMain,
+		CompletionOptions: CompOpt,
 	}
 
 	cmd.AddCommand(showHelpCmd)
 
 	return cmd
+}
+
+func getApiArgs(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	// XXX: disable showing contents of current directory
+
+	return nil, cobra.ShellCompDirectiveNoFileComp
 }
 
 func apiGroupMain(cobraCmd *cobra.Command, args []string) {
