@@ -43,6 +43,18 @@ func ParseConfig(fileName string) (*AcwConfig, error) {
 	return &cc, nil
 }
 
+func WriteConfig(conf *AcwConfig, fileName string) error {
+	yamlData, err := yaml.Marshal(conf)
+
+	fileName, _ = filepath.Abs(fileName)
+	err = ioutil.WriteFile(fileName, yamlData, 644)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func YamlTest() {
 	c := AcwConfig{
 		Version: "1",

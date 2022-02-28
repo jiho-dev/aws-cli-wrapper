@@ -3,9 +3,24 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path"
 
+	"github.com/jiho-dev/aws-cli-wrapper/config"
 	"github.com/spf13/cobra"
 )
+
+var awsDir = os.Getenv("HOME") + "/.aws/"
+var acwConf = "acw.yaml"
+var AcwConfig *config.AcwConfig
+
+var CompOpt = cobra.CompletionOptions{
+	DisableDefaultCmd:   true,
+	DisableNoDescFlag:   true,
+	HiddenDefaultCmd:    true,
+	DisableDescriptions: true,
+}
+
+/////////////////////////////////
 
 var rootCmd = &cobra.Command{
 	Use:               "acw",
@@ -38,20 +53,28 @@ var CompletionCmd = &cobra.Command{
 }
 
 func init() {
+	confFile := path.Join(awsDir, acwConf)
+	conf, err := config.ParseConfig(confFile)
+	if err != nil {
+		return
+	}
+
+	AcwConfig = conf
+
+	for apiGroup, apis := range conf.ApiGroup {
+		subCmd := InitApiGroupCmd(apiGroup, apis)
+
+		rootCmd.AddCommand(subCmd)
+	}
+
+	genCmd := InitGenAdminVpcCmd()
+	rootCmd.AddCommand(genCmd)
+
 	rootCmd.AddCommand(CompletionCmd)
 }
 
 // Execute executes cmd
 func Execute() error {
-
-	/*
-		rootCmd.CompletionOptions = cobra.CompletionOptions{
-			DisableDefaultCmd:   true,
-			DisableNoDescFlag:   true,
-			HiddenDefaultCmd:    true,
-			DisableDescriptions: true,
-		}
-	*/
 
 	//rootCmd.SetHelpFunc(Help)
 	return rootCmd.Execute()

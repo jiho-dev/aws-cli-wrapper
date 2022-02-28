@@ -7,11 +7,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/jiho-dev/aws-cli-wrapper/config"
-	"github.com/spf13/cobra"
 	"github.com/vaughan0/go-ini"
 )
 
+/*
 var awsDir = os.Getenv("HOME") + "/.aws/"
 var AcwConfig *config.AcwConfig
 
@@ -41,6 +40,7 @@ func init() {
 		rootCmd.AddCommand(subCmd)
 	}
 }
+*/
 
 func listProfiles() []string {
 	// Make sure the config file exists
