@@ -13,6 +13,8 @@ var awsDir = os.Getenv("HOME") + "/.aws/"
 var acwConf = "acw.yaml"
 var AcwConfig *config.AcwConfig
 
+var apiGroups = []string{CMD_ADMIN_VPC, CMD_EC2}
+
 var CompOpt = cobra.CompletionOptions{
 	DisableDefaultCmd:   true,
 	DisableNoDescFlag:   true,
@@ -66,9 +68,6 @@ func init() {
 
 		rootCmd.AddCommand(subCmd)
 	}
-
-	genCmd := InitGenAdminVpcCmd()
-	rootCmd.AddCommand(genCmd)
 
 	rootCmd.AddCommand(CompletionCmd)
 }

@@ -33,28 +33,29 @@ func InitApiGroupCmd(apiGroup string, apis config.AcwConfigApis) *cobra.Command 
 		}
 
 		addProfileCmd(subCmd)
-		subCmd.Flags().Bool(SHOW_HELP, false, "")
+		subCmd.Flags().Bool(CMD_SHOW_HELP, false, "")
 
 		cmd.AddCommand(subCmd)
 	}
 
 	showHelpCmd := &cobra.Command{
-		Use:               SHOW_HELP,
+		Use:               CMD_SHOW_HELP,
 		Run:               apiGroupMain,
 		CompletionOptions: CompOpt,
 	}
-
 	addProfileCmd(showHelpCmd)
-
 	cmd.AddCommand(showHelpCmd)
+
+	genCmd := InitGenerateCmd(apiGroup)
+	cmd.AddCommand(genCmd)
 
 	return cmd
 }
 
 func addProfileCmd(cmd *cobra.Command) {
-	cmd.Flags().String(PROFILE, "", "")
-	cmd.MarkFlagRequired(PROFILE)
-	cmd.RegisterFlagCompletionFunc(PROFILE, getProfile)
+	cmd.Flags().String(CMD_PROFILE, "", "")
+	cmd.MarkFlagRequired(CMD_PROFILE)
+	cmd.RegisterFlagCompletionFunc(CMD_PROFILE, getProfile)
 }
 
 func getProfile(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
@@ -99,7 +100,7 @@ func apiGroupMain(cobraCmd *cobra.Command, args []string) {
 		apiArgs = append(apiArgs, opts.Required...)
 	}
 
-	isAdminVpc := parent.Use == ADMIN_VPC
+	isAdminVpc := parent.Use == CMD_ADMIN_VPC
 
 	output, err := RunCmd(inCmds, apiArgs, isAdminVpc, flags)
 	if err != nil {
