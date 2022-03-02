@@ -238,8 +238,8 @@ func InitGenerateCmd(apiGroup string) *cobra.Command {
 		//DisableFlagsInUseLine: true,
 		//ValidArgs: []string{"bash", "zsh", "fish", "powershell"},
 		//Args: cobra.ExactValidArgs(1),
-
-		Run: generateCmdMain,
+		Run:               generateCmdMain,
+		ValidArgsFunction: getApiArgs,
 	}
 
 	if apiGroup == CMD_ADMIN_VPC {
