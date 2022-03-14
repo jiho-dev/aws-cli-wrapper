@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"sort"
 
 	"gopkg.in/yaml.v3"
 )
@@ -11,20 +12,21 @@ import (
 /////////////////////
 
 type AcwConfigApiOpt struct {
-	OutputField string   `yaml:outputfield`
-	Required    []string `yaml:required`
-	Args        []string `yaml:args`
+	OutputField string   `yaml:"OutputField"`
+	Required    []string `yaml:"Required"`
+	Args        []string `yaml:"Args"`
 }
 
 // Key: api name
 type AcwConfigApis map[string]AcwConfigApiOpt
 
-// key: api group: [ ec2 | admin-vpc ]
-type AcwConfigApiGroup map[string]AcwConfigApis
+const API_TERMINATED = "api-terminated"
 
 type AcwConfig struct {
-	Version  string
-	ApiGroup AcwConfigApiGroup
+	Version         string                         `yaml:"Version"`
+	ApiPrefixFilter []string                       `yaml:"ApiPrefixFilter"`
+	ApiPrefix       map[string]map[string][]string `yaml:"ApiPrefix"`
+	ApiOptions      map[string]AcwConfigApiOpt     `yaml:"ApiOptions"` // key: api, value: api-option
 }
 
 func ParseConfig(fileName string) (*AcwConfig, error) {
@@ -58,38 +60,46 @@ func WriteConfig(conf *AcwConfig, fileName string) error {
 func YamlTest() {
 	c := AcwConfig{
 		Version: "1",
-		ApiGroup: AcwConfigApiGroup{
-			"admin-vpc": AcwConfigApis{
-				"list-network-interface": AcwConfigApiOpt{
-					OutputField: "NetworkInterfaces",
-					Args:        []string{"host-ip", "network-interface-id", "vpc-id"},
-				},
 
-				"list-address-associations": AcwConfigApiOpt{
-					OutputField: "NetworkInterfaces",
-				},
-				"list-public-ips": AcwConfigApiOpt{
-					OutputField: "NetworkInterfaces",
-				},
+		ApiPrefixFilter: []string{
+			"describe-network",
+			"describe-no",
+		},
+
+		ApiPrefix: map[string]map[string][]string{
+			"describe": {
+				"network": []string{"acls", "interfaces"},
+				"volumes": []string{API_TERMINATED, "modifications"},
+			},
+			"import": {
+				"image":    []string{API_TERMINATED},
+				"key":      []string{"pair"},
+				"snapshot": []string{API_TERMINATED},
+			},
+			"modify": {
+				"hosts":    []string{API_TERMINATED},
+				"instance": []string{"attribute", "capacity-reservation-attributes", "event-window"},
+				"snapshot": []string{API_TERMINATED},
+			},
+			"wait": {
+				API_TERMINATED: []string{},
+			},
+		},
+
+		ApiOptions: map[string]AcwConfigApiOpt{
+			"describe-network-interfaces": {
+				OutputField: "NetworkInterfaces",
+				Args:        []string{"host-ip", "network-interface-id", "vpc-id"},
 			},
 
-			"ec2": AcwConfigApis{
-				"describe-instances": AcwConfigApiOpt{
-					OutputField: "NetworkInterfaces",
-					Args:        []string{"instance-ids"},
-				},
-				"describe-network-interfaces": AcwConfigApiOpt{
-					OutputField: "NetworkInterfaces",
-					Args:        []string{"network-interface-ids"},
-				},
-
-				"get-console-output": AcwConfigApiOpt{
-					OutputField: "Output",
-					Required:    []string{"instance-id"},
-				},
+			"describe-network-acls": {
+				OutputField: "NetworkInterfaces",
+				Args:        []string{"host-ip", "nacl-id", "vpc-id"},
 			},
 		},
 	}
+
+	sort.Strings(c.ApiPrefixFilter)
 
 	yamlData, err := yaml.Marshal(&c)
 

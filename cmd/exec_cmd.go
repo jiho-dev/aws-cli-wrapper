@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"os/exec"
-	"strings"
 
 	"github.com/TylerBrock/colorjson"
 	"github.com/fatih/color"
+	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
 	"github.com/tidwall/gjson"
 )
@@ -111,26 +111,49 @@ func FormatJson(output string) string {
 }
 
 func ShowEc2Cmd() string {
-	var o []string
-	out, _ := ExecuteAwsCli("aws", "ec2", "help")
-	l := strings.Split(out, "\n")
-	for _, cmd := range l {
-		if strings.Index(cmd, "o ") < 0 {
-			continue
-		}
+	var allEc2Cmds []string
 
-		cmd = strings.TrimSpace(cmd)
-		if len(cmd) < 1 {
-			continue
-		}
+	allEc2Cmds = GetEc2Apis(nil)
 
-		cc := strings.Split(cmd, " ")
-		if len(cc) < 2 {
-			continue
-		}
+	/*
+		out, _ := ExecuteAwsCli("aws", "ec2", "help")
+		l := strings.Split(out, "\n")
+		for _, cmd := range l {
+			if strings.Index(cmd, "o ") < 0 {
+				continue
+			}
 
-		o = append(o, cc[1])
+			cmd = strings.TrimSpace(cmd)
+			if len(cmd) < 1 {
+				continue
+			}
+
+			cc := strings.Split(cmd, " ")
+			if len(cc) < 2 {
+				continue
+			}
+
+			allEc2Cmds = append(allEc2Cmds, cc[1])
+		}
+	*/
+
+	//cmds := strings.Join(allEc2Cmds, "\n")
+	for _, api := range allEc2Cmds {
+		fmt.Printf("  %s \n", api)
 	}
 
-	return strings.Join(o, "\n")
+	return ""
+}
+
+func ShowApiMain(cobraCmd *cobra.Command, args []string) {
+	switch cobraCmd.Use {
+	case "show-ec2-api":
+		ShowEc2Cmd()
+
+	case "show-admin-vpc-api":
+		fmt.Printf("Admin-Vpc subcommands: \n")
+		for api, _ := range AdminVpcCmds {
+			fmt.Printf("  %s\n", api)
+		}
+	}
 }

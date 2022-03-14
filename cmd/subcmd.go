@@ -3,53 +3,74 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/jiho-dev/aws-cli-wrapper/config"
 	"github.com/spf13/cobra"
 )
 
-func InitApiGroupCmd(apiGroup string, apis config.AcwConfigApis) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:               apiGroup,
-		Run:               apiGroupMain,
+func InitApiParams(fullApi string, cmd *cobra.Command) {
+	opt, ok := AcwConfig.ApiOptions[fullApi]
+	if !ok {
+		return
+	}
+
+	for _, o := range opt.Required {
+		cmd.Flags().String(o, "", "")
+		cmd.MarkFlagRequired(o)
+	}
+
+	for _, o := range opt.Args {
+		cmd.Flags().String(o, "", "")
+	}
+
+	addProfileCmd(cmd)
+	cmd.Flags().Bool(CMD_SHOW_HELP, false, "")
+}
+
+func InitApiCmd(api string, sub map[string][]string) *cobra.Command {
+	cmd1 := &cobra.Command{
+		Use:               api,
+		Run:               apiMain,
 		CompletionOptions: CompOpt,
 	}
 
-	for apiName, opt := range apis {
-		subCmd := &cobra.Command{
-			Use:               apiName,
-			Run:               cmd.Run,
+	for api2, sub2 := range sub {
+		if api2 == config.API_TERMINATED {
+			InitApiParams(api, cmd1)
+			continue
+		}
+
+		cmd2 := &cobra.Command{
+			Use:               api2,
+			Run:               cmd1.Run,
 			ValidArgsFunction: getApiArgs,
 			CompletionOptions: CompOpt,
 		}
 
-		for _, o := range opt.Required {
-			subCmd.Flags().String(o, "", "")
-			subCmd.MarkFlagRequired(o)
+		for _, api3 := range sub2 {
+			if api3 == config.API_TERMINATED {
+				fullApi := api + "-" + api2
+				InitApiParams(fullApi, cmd2)
+			} else {
+				cmd3 := &cobra.Command{
+					Use:               api3,
+					Run:               cmd1.Run,
+					ValidArgsFunction: getApiArgs,
+					CompletionOptions: CompOpt,
+				}
+
+				fullApi := api + "-" + api2 + "-" + api3
+				InitApiParams(fullApi, cmd3)
+
+				cmd2.AddCommand(cmd3)
+			}
 		}
 
-		for _, o := range opt.Args {
-			subCmd.Flags().String(o, "", "")
-		}
-
-		addProfileCmd(subCmd)
-		subCmd.Flags().Bool(CMD_SHOW_HELP, false, "")
-
-		cmd.AddCommand(subCmd)
+		cmd1.AddCommand(cmd2)
 	}
 
-	showHelpCmd := &cobra.Command{
-		Use:               CMD_SHOW_HELP,
-		Run:               apiGroupMain,
-		CompletionOptions: CompOpt,
-	}
-	addProfileCmd(showHelpCmd)
-	cmd.AddCommand(showHelpCmd)
-
-	genCmd := InitGenerateCmd(apiGroup)
-	cmd.AddCommand(genCmd)
-
-	return cmd
+	return cmd1
 }
 
 func addProfileCmd(cmd *cobra.Command) {
@@ -68,41 +89,43 @@ func getApiArgs(cmd *cobra.Command, args []string, toComplete string) ([]string,
 	return nil, cobra.ShellCompDirectiveNoFileComp
 }
 
-func apiGroupMain(cobraCmd *cobra.Command, args []string) {
-	var depth int
-	var inCmds []string
+func ReverseStringSlice(s []string) {
+	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+		s[i], s[j] = s[j], s[i]
+	}
+}
+
+func apiMain(cobraCmd *cobra.Command, args []string) {
+	var apis []string
 
 	flags := cobraCmd.Flags()
-	inCmds = append(inCmds, cobraCmd.Use)
+	apis = append(apis, cobraCmd.Use)
 
 	var c1 = cobraCmd
 	for c1.HasParent() {
 		c1 = c1.Parent()
-		inCmds = append(inCmds, c1.Use)
-		depth++
+		apis = append(apis, c1.Use)
 	}
 
-	// acw <api-group> <cmd> [args]
-	//                 ^
-	// 0   1           2
-	if depth < 2 {
+	ReverseStringSlice(apis)
+	// cut the first cmd out
+	apis = apis[1:]
+	fullApi := strings.Join(apis, "-")
+
+	opts, ok := AcwConfig.ApiOptions[fullApi]
+	if !ok {
+		fmt.Printf("Unsupported API: %s \n", fullApi)
 		cobraCmd.Help()
 		os.Exit(0)
 	}
 
-	parent := cobraCmd.Parent()
-	apis, ok := AcwConfig.ApiGroup[parent.Use]
-
 	var apiArgs []string
-	opts, ok := apis[cobraCmd.Use]
-	if ok {
-		apiArgs = append(apiArgs, opts.Args...)
-		apiArgs = append(apiArgs, opts.Required...)
-	}
+	apiArgs = append(apiArgs, opts.Args...)
+	apiArgs = append(apiArgs, opts.Required...)
 
-	isAdminVpc := parent.Use == CMD_ADMIN_VPC
+	_, isAdminVpc := AdminVpcCmds[fullApi]
 
-	output, err := RunCmd(inCmds, apiArgs, isAdminVpc, flags)
+	output, err := RunCmd([]string{fullApi}, apiArgs, isAdminVpc, flags)
 	if err != nil {
 		if output != "" {
 			fmt.Printf("Output: %s \n", output)
@@ -126,8 +149,6 @@ func apiGroupMain(cobraCmd *cobra.Command, args []string) {
 	if output2 == "" || output2 == "{}" {
 		output2 = output1
 	}
-
-	//output = strings.Replace(output, "\\r\\n", "\r\n", -1)
 
 	fmt.Printf("%s\n", output2)
 }

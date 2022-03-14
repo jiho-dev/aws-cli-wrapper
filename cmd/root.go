@@ -13,8 +13,6 @@ var awsDir = os.Getenv("HOME") + "/.aws/"
 var acwConf = "acw.yaml"
 var AcwConfig *config.AcwConfig
 
-var apiGroups = []string{CMD_ADMIN_VPC, CMD_EC2}
-
 var CompOpt = cobra.CompletionOptions{
 	DisableDefaultCmd:   true,
 	DisableNoDescFlag:   true,
@@ -26,8 +24,8 @@ var CompOpt = cobra.CompletionOptions{
 
 var rootCmd = &cobra.Command{
 	Use:               "acw",
-	Short:             "acw <api-group> <sub-cmd> [flags]",
-	Long:              "aws-cli-wrapper to support shell completion for some command",
+	Short:             "acw <api> <sub-api> [flags]",
+	Long:              "aws-completion to support shell completion of AWS APIs",
 	CompletionOptions: CompOpt,
 }
 
@@ -54,6 +52,20 @@ var CompletionCmd = &cobra.Command{
 	},
 }
 
+var showEc2ApiCmd = &cobra.Command{
+	Use:               "show-ec2-api",
+	Short:             "show ec2 api",
+	Run:               ShowApiMain,
+	ValidArgsFunction: getApiArgs,
+}
+
+var showAdminVpcApiCmd = &cobra.Command{
+	Use:               "show-admin-vpc-api",
+	Short:             "show admin-vpc api",
+	Run:               ShowApiMain,
+	ValidArgsFunction: getApiArgs,
+}
+
 func init() {
 	confFile := path.Join(awsDir, acwConf)
 	conf, err := config.ParseConfig(confFile)
@@ -63,30 +75,25 @@ func init() {
 
 	AcwConfig = conf
 
-	for apiGroup, apis := range conf.ApiGroup {
-		subCmd := InitApiGroupCmd(apiGroup, apis)
-
+	for api, subApi := range conf.ApiPrefix {
+		subCmd := InitApiCmd(api, subApi)
 		rootCmd.AddCommand(subCmd)
 	}
 
 	rootCmd.AddCommand(CompletionCmd)
+
+	genCmd := InitGenerateCmd()
+	rootCmd.AddCommand(genCmd)
+	rootCmd.AddCommand(showEc2ApiCmd)
+	rootCmd.AddCommand(showAdminVpcApiCmd)
 }
 
 // Execute executes cmd
 func Execute() error {
-
-	//rootCmd.SetHelpFunc(Help)
 	return rootCmd.Execute()
-
-	return nil
-
 }
 
 func Help(cmd *cobra.Command, s []string) {
-
-	fmt.Printf("%s: warpper of aws cli for SPC\n\n", cmd.Use)
-
-	fmt.Printf("Usage: %s <api-group> <sub-cmd> [flags] \n", cmd.Use)
-	fmt.Printf("  <api-group>: group of api, admin-vpc or ec2 \n")
-	fmt.Printf("  <sub-cmd>: \n")
+	fmt.Printf("%s: aws completion \n\n", cmd.Use)
+	fmt.Printf("Usage: %s <api> <sub-api> [flags] \n", cmd.Use)
 }
